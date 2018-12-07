@@ -1,0 +1,15 @@
+#¶Ë¿ÚºÅ
+server:
+  port: 8086
+
+spring:
+#RabbitMQ ÅäÖÃ
+  rabbitmq:
+    port: 5672
+    host: 127.0.0.1
+    username: guest
+    password: guest
+
+
+
+

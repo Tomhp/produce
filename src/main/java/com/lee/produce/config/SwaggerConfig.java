@@ -32,7 +32,7 @@ public class SwaggerConfig {
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
                 //自定义信息可按需求填写
-                .title("Spring Boot中使用Swagger构建RESTful API")
+                .title("RESTFUL API")
                 .description("swagger")
                 .termsOfServiceUrl("http://github.com/Tomhp")
                 .contact("lee")

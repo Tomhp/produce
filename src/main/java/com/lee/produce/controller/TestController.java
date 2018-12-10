@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 
 import static com.lee.produce.ProduceApplication.KEY_LEE_TEST;
 
@@ -37,6 +39,10 @@ public class TestController {
     @Qualifier(value = "exchangeEventTest")
     @Autowired
     private DirectExchange directExchange;
+    @Autowired
+    RestTemplate restTemplate;
+    private static  final int NUM_COUNT = 50;
+    private static CountDownLatch countDownLatch = new CountDownLatch(NUM_COUNT);
     private static final Logger logger = LoggerFactory.getLogger(TestController.class);
 
     public static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -54,7 +60,35 @@ public class TestController {
         logger.info("test");
         return "hello";
     }
+    @ApiOperation(value = "并发测试")
+    @RequestMapping(value = "/thread", method = RequestMethod.POST)
+    public void testThread() throws InterruptedException {
+      
+        for (int i = 0; i < NUM_COUNT; i++) {
+            new Thread(new TestRequest(restTemplate)).start();
+            countDownLatch.countDown();
+        }
+        Thread.currentThread().sleep(2000);
+    }
 
+    class TestRequest implements Runnable {
+        private RestTemplate restTemplate;
+
+        public  TestRequest(RestTemplate restTemplate) {
+            this.restTemplate = restTemplate;
+        }
+
+        @Override
+        public void run() {
+            try {
+                countDownLatch.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            String re = restTemplate.postForObject("","",String.class);
+            System.out.println(re);
+        }
+    }
     @ApiOperation(value = "excel 导入测试")
     @RequestMapping(value = "/excel", method = RequestMethod.POST)
     public void importExcel(MultipartFile importFile) throws Exception {

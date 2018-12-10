@@ -1,4 +1,4 @@
-package com.shipparts.console.entity;
+package com.lee.produce.entity;
 
 import java.util.Date;
 
